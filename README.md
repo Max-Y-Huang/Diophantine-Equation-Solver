@@ -1,1 +1,1 @@
-"# Diophantine-Equation-Solver" 
+# Diophantine-Equation-Solver
