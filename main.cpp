@@ -11,6 +11,8 @@
  * 
  * History (YYYY/MM/DD):   2018/11/09:
  *                          - Initial creation
+ *                         2018/11/16
+ *                          - Fixed error with simplifiable equations
  ***********************************************************************************/
 
 #include <cstdio>
@@ -34,24 +36,26 @@ GCDLog make_gcdLog(int a, int b, int c, int d) {
     return l;
 }
 
-bool findCoprimeWithGCD(vector <GCDLog> &gcdLog, int a, int b) {
+int gcd(int a, int b) {
+
+    if (a % b == 0) {
+        return b;
+    }
+
+    return gcd(b, a % b);
+}
+
+void createLog(vector <GCDLog> &gcdLog, int a, int b) {
 
     // push back log for euclidean algorithm, print log item
     gcdLog.push_back(make_gcdLog(a, a / b, b, a % b));
     printf("%d = %d - %d(%d)\n", a % b, a, a / b, b);
 
-    // if a and b are not coprime; no solution for diophantine equation
-    if (a % b == 0) {
-        return false;
+    if (a % b == 0 || a % b == 1) {
+        return;
     }
 
-    // if a and b are coprime; solution for diophantine equation
-    if (a % b == 1) {
-        return true;
-    }
-
-    // input b and a % b as new values for euclidean algorithm
-    findCoprimeWithGCD(gcdLog, b, a % b);
+    createLog(gcdLog, b, a % b);
 }
 
 void solveDiophantine(vector <GCDLog> gcdLog, int n) {
@@ -152,16 +156,8 @@ int main() {
     cout << endl;
     cout << "SOLUTION FOR " << a << "x + " << b << "y = " << n << endl;
 
-    // use Euclidean algorithm to determine whether or not the equation can be solved
-    // log the steps taken
-    // input max(a, b) as the first coefficient, input min(a, b) as the second coefficient
-    cout << endl;
-    cout << "Using Euclidean algorithm" << endl;
-    bool solvable = findCoprimeWithGCD(gcdLog, a, b);
+    if (gcd(a, b) != gcd(gcd(a, b), n)) {
 
-    // print no solution if problem is unsolvable
-    if (!solvable) {
-        
         cout << "No solution" << endl;
 
         // wait after program finishes
@@ -169,6 +165,13 @@ int main() {
         getchar();
         return 0;
     }
+
+    // use Euclidean algorithm to determine whether or not the equation can be solved
+    // log the steps taken
+    // input max(a, b) as the first coefficient, input min(a, b) as the second coefficient
+    cout << endl;
+    cout << "Using Euclidean algorithm" << endl;
+    createLog(gcdLog, a, b);
 
     // solve Diophantine equation
     cout << endl;
